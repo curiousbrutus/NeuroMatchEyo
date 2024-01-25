@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <title>Strømpris</title>
+        <style>
+            body {
+                margin: 0;
+                font-family: Helvetica, Arial, sans-serif;
+            }
+    
+            .error {
+                color: red;
+            }
+    
+            .topnav {
+                overflow: hidden;
+                background-color: #333;
+            }
+    
+            .topnav a {
+                float: left;
+                color: #f2f2f2;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+                font-size: 17px;
+            }
+    
+            .topnav a:hover {
+                background-color: #69dadb;
+                color: black;
+            }
+    
+            .topnav a.active {
+                background-color: #193498;
+                color: white;
+            }
+        </style>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@5.6.0"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+    </head>
+
+<body>
+    <!-- Navigation Bar -->
+    <!-- Navigation Bar -->
+    <div class="topnav">
+        <a class="active">Home</a>
+        <a href="/docs">FastAPI Docs</a>
+        <a href="/help">help</a>    
+      </div>
+
+    <h1>Energy Prices for Activity</h1>
+    <p>This chart visualizes energy prices for a specific activity.</p>
+
+    <!-- Additional information about the dataset -->
+    <p>Data source: Hvem Koster Strømmen API</p>
+
+    <!-- FastAPI Documentation Link -->
+    <p>Explore FastAPI documentation <a href="https://fastapi.tiangolo.com/" target="_blank">here</a></p>
+
+    <!-- Altair chart embedded here -->
+    <div id="activity-vis"></div>
+    <form action="javascript:refreshActivityPlot()" id="activity-form">
+        <!-- Location(s) selection inputs -->
+        <label>Location:</label>
+        <select id="activity-location" name="location">
+            {% for code, name in location_codes.items() %}
+                <option value="{{ code }}">{{ name }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Activity selection inputs -->
+        <label>Activity:</label>
+        <select id="activity-name" name="activity">
+            {% for activity, energy_usage in activities.items() %}
+                <option value="{{ activity }}">{{ activity }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Duration input -->
+        <label for="activity-minutes">Duration (minutes):</label>
+        <input type="number" id="activity-minutes" name="minutes" value="10" min="1" required>
+    </form>
+
+    <script type="text/javascript">
+        async function refreshActivityPlot() {
+            const plotUrl = new URL(
+                `${document.location.protocol}//${document.location.host}/plot_activity.json`,
+            );
+
+            const locationInput = document.querySelector('#activity-location');
+            if (locationInput) {
+                plotUrl.searchParams.append("location", locationInput.value);
+            }
+
+            const activityInput = document.querySelector('#activity-name');
+            if (activityInput) {
+                plotUrl.searchParams.append("activity", activityInput.value);
+            }
+
+            const minutesInput = document.querySelector('#activity-minutes');
+            if (minutesInput) {
+                plotUrl.searchParams.append("minutes", minutesInput.value);
+            }
+
+            try {
+                const response = await fetch(plotUrl.href);
+                const spec = await response.json();
+                vegaEmbed("#activity-vis", spec);
+            } catch (error) {
+                showError(document.getElementById("activity-vis"), error);
+            }
+        }
+
+        function showError(el, error) {
+            el.innerHTML =
+                '<div class="error" style="color:red;">' +
+                "<p>JavaScript Error: " +
+                error.message +
+                "</p

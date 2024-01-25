@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Strømpris</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .topnav a:hover {
+            background-color: #69dadb;
+            color: black;
+        }
+
+        .topnav a.active {
+            background-color: #193498;
+            color: white;
+        }
+    </style>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@5.6.0"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <div class="topnav">
+        <a href="/">Home</a>
+        <a href="/docs">FastAPI Docs</a>
+        <a href="/help">Help</a>    
+    </div>
+
+    <h1>Energy Prices Over Time</h1>
+    <p>This chart visualizes energy prices for the last 7 days.</p>
+
+    <!-- Additional information about the dataset -->
+    <p>Data source: Hvem Koster Strømmen API</p>
+
+    <!-- FastAPI Documentation Link -->
+    <p>Explore FastAPI documentation <a href="https://fastapi.tiangolo.com/" target="_blank">here</a></p>
+
+    <!-- Altair chart embedded here -->
+    <div id="vis"></div>
+
+    <script type="text/javascript">
+        async function refreshPlot() {
+          // begin constructing URL to request the plot JSON
+          const plotUrl = new URL(
+            `${document.location.protocol}//${document.location.host}/plot_antartica.json`,
+          );
+  
+          // get inputs from the form
+  
+          console.log(`requesting new chart from ${plotUrl.href}`);
+          var response = await fetch(plotUrl.href);
+          var spec = await response.json();
+  
+          var embedOpt = { mode: "vega-lite" };
+  
+          function showError(el, error) {
+            el.innerHTML =
+              '<div class="error" style="color:red;">' +
+              "<p>JavaScript Error: " +
+              error.message +
+              "</p>" +
+              "<p>This usually means there's a typo in your chart specification. " +
+              "See the javascript console for the full traceback.</p>" +
+              "</div>";
+            throw error;
+          }
+          const el = document.getElementById("vis");
+          vegaEmbed("#vis", spec, embedOpt).catch((error) =>
+            showError(el, error),
+          );
+        }
+        function w3_open() {
+          document.getElementById("mySidebar").style.display = "block";
+        }
+  
+        function w3_close() {
+          document.getElementById("mySidebar").style.display = "none";
+        }
+        refreshPlot();
+      </script>
+</body>
+
+</html>

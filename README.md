@@ -9,3 +9,5 @@ problem solving skills in different languages.
 - HTML
 
 I practiced and enjoyed it very much.
+
+Source:  Assignments and the assignments are published at http://pages.github.uio.no/IN3110/assignments/assignments/
